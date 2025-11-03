@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from pydantic import Field, field_validator
+import os
 
 
 class Settings(BaseSettings):
@@ -35,7 +36,6 @@ class Settings(BaseSettings):
     @classmethod
     def validate_jwt_secret(cls, v: str) -> str:
         # Allow short secrets for testing
-        import os
         if os.getenv("TESTING") == "true":
             return v if v else "test_secret_key_for_testing_only_change_in_production"
         if v == "change_me" or (len(v) < 32 if v else False):
@@ -48,5 +48,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore[call-arg]
-
-
