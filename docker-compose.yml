@@ -40,6 +40,20 @@ services:
     depends_on:
       - backend
 
+  webhook-service:
+    build: ./ruby_services
+    env_file:
+      - ./.env
+    environment:
+      PYTHON_API_URL: http://backend:8000
+      NOWPAYMENTS_IPN_SECRET: ${NOWPAYMENTS_IPN_SECRET}
+      WEBHOOK_PORT: 4567
+    ports:
+      - "4567:4567"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
 volumes:
   db_data:
 

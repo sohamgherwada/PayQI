@@ -25,7 +25,9 @@ PayQI is a modern payment gateway API that enables merchants to accept cryptocur
 
 PayQI consists of:
 
-- **Backend API** - FastAPI-based REST API for handling payments, authentication, and transactions
+- **Backend API** (Python/FastAPI) - REST API for handling payments, authentication, and transactions
+- **Webhook Service** (Ruby/Sinatra) - Secure webhook processing for payment notifications
+- **CLI Tool** (Ruby/Thor) - Command-line interface for merchants (Shopify CLI style)
 - **Database** - PostgreSQL database for storing merchant and payment data
 - **Payment Providers**:
   - **NOWPayments** - For BTC, ETH, USDT, USDC, LTC, DOGE
@@ -35,6 +37,7 @@ PayQI consists of:
 
 - Docker and Docker Compose
 - Python 3.11+ (for local development)
+- Ruby 3.2+ (for Ruby services/CLI)
 - PostgreSQL 15+ (if running database separately)
 
 ## Quick Start
@@ -75,10 +78,20 @@ PayQI consists of:
    docker-compose up -d
    ```
 
-4. **Access the API**
-   - API Base URL: `http://localhost:8000`
-   - API Documentation: `http://localhost:8000/docs`
-   - Health Check: `http://localhost:8000/health`
+4. **Access the services**
+   - Python API Base URL: `http://localhost:8000`
+   - Python API Documentation: `http://localhost:8000/docs`
+   - Python API Health: `http://localhost:8000/health`
+   - Ruby Webhook Service: `http://localhost:4567`
+   - Webhook Service Health: `http://localhost:4567/health`
+
+5. **Try the Ruby CLI** (optional)
+   ```bash
+   cd ruby_services
+   bundle install
+   chmod +x cli/payqi_cli.rb
+   ./cli/payqi_cli.rb help
+   ```
 
 ### Local Development
 
@@ -266,13 +279,14 @@ For production XRP payment verification:
 
 ```
 .
-??? backend/
+??? backend/                      # Python FastAPI backend
 ?   ??? app/
-?   ?   ??? routers/
-?   ?   ?   ??? __init__.py
+?   ?   ??? routers/             # API endpoints
 ?   ?   ?   ??? auth.py          # Authentication endpoints
 ?   ?   ?   ??? payments.py      # Payment creation and management
 ?   ?   ?   ??? transactions.py  # Transaction history
+?   ?   ??? middleware/           # Security middleware
+?   ?   ??? utils/               # Utilities (logging, cache)
 ?   ?   ??? config.py            # Configuration settings
 ?   ?   ??? database.py          # Database setup
 ?   ?   ??? deps.py              # Dependency injection
@@ -282,8 +296,47 @@ For production XRP payment verification:
 ?   ?   ??? security.py          # Security utilities
 ?   ??? Dockerfile
 ?   ??? requirements.txt
+??? ruby_services/                # Ruby microservices
+?   ??? webhook_service.rb       # Sinatra webhook processor
+?   ??? config.ru                # Rack configuration
+?   ??? lib/
+?   ?   ??? payqi_client.rb      # Ruby API client library
+?   ??? cli/
+?   ?   ??? payqi_cli.rb         # CLI tool (Thor-based)
+?   ??? Gemfile                  # Ruby dependencies
+?   ??? Dockerfile               # Ruby service Dockerfile
+?   ??? README.md                # Ruby services documentation
 ??? docker-compose.yml
 ??? README.md
+```
+
+## Ruby Services
+
+PayQI includes Ruby microservices demonstrating Shopify-relevant skills:
+
+- **Webhook Service** - Sinatra-based service for secure webhook processing
+- **Ruby API Client** - Clean Ruby library for API interactions (similar to Shopify API gems)
+- **CLI Tool** - Shopify CLI-style command-line interface
+
+See [`ruby_services/README.md`](ruby_services/README.md) for detailed documentation.
+
+### Quick Ruby CLI Usage
+
+```bash
+cd ruby_services
+bundle install
+
+# Register merchant
+./cli/payqi_cli.rb register merchant@example.com password123
+
+# Login (token saved to .env)
+./cli/payqi_cli.rb login merchant@example.com password123
+
+# Create XRP payment
+./cli/payqi_cli.rb payment 10.00 XRP
+
+# View all transactions
+./cli/payqi_cli.rb transactions
 ```
 
 ## Development
