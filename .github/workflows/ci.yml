@@ -1,24 +1,16 @@
 name: CI
 
+# This workflow is kept for organizational purposes
+# Individual workflows run on their own triggers (push/PR)
+# This ensures all checks run even if paths don't match
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+  workflow_dispatch:
 
 jobs:
-  python-tests:
-    uses: ./.github/workflows/python-tests.yml
-    secrets: inherit
-
-  ruby-tests:
-    uses: ./.github/workflows/ruby-tests.yml
-    secrets: inherit
-
-  code-quality:
-    uses: ./.github/workflows/code-quality.yml
-    secrets: inherit
-
-  security:
-    uses: ./.github/workflows/security.yml
-    secrets: inherit
+  # Jobs are defined in individual workflow files
+  # They run automatically on push/PR via their own triggers
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI Status
+        run: echo "✅ Individual workflows run on push/PR automatically"
