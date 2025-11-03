@@ -339,21 +339,93 @@ bundle install
 ./cli/payqi_cli.rb transactions
 ```
 
-## Development
+## Testing
 
-### Running Tests
+PayQI includes comprehensive test suites for both Python and Ruby components.
+
+### Python Tests (pytest)
 
 ```bash
-# TODO: Add tests
-pytest
+# Quick test run
+cd backend
+./run_tests.sh
+
+# Or manually
+pip install -r requirements.txt
+pytest tests/ -v
+
+# Run specific test file
+pytest tests/test_auth.py -v
+
+# Run with coverage
+pytest --cov=app --cov-report=html
 ```
+
+**Test Coverage:**
+- ? Authentication (registration, login, JWT)
+- ? Payment creation (XRP, NOWPayments)
+- ? Transaction management
+- ? Security utilities
+- ? Authorization and access control
+
+See [`backend/tests/README.md`](backend/tests/README.md) for detailed documentation.
+
+### Ruby Tests (RSpec)
+
+```bash
+# Quick test run
+cd ruby_services
+./run_tests.sh
+
+# Or manually
+bundle install
+bundle exec rspec
+
+# Run specific test file
+bundle exec rspec spec/webhook_service_spec.rb
+```
+
+**Test Coverage:**
+- ? Webhook service endpoints
+- ? Signature verification
+- ? Ruby API client
+- ? Error handling
+
+See [`ruby_services/spec/README.md`](ruby_services/spec/README.md) for detailed documentation.
+
+### Integration Testing (Live API)
+
+Test the running API with the integration test script:
+
+```bash
+# Make sure API is running first
+docker-compose up -d backend
+
+# Run integration tests
+./test_api.sh
+
+# Or test against custom URL
+API_URL=http://localhost:8000 ./test_api.sh
+```
+
+The integration test script will:
+1. Check API health
+2. Register a test merchant
+3. Login and get token
+4. Create payments
+5. Retrieve payment details
+6. List transactions
+7. Test error cases
 
 ### Code Formatting
 
 ```bash
-# TODO: Add formatting configuration
-black .
-isort .
+# Python
+black backend/
+isort backend/
+
+# Ruby
+bundle exec rubocop ruby_services/
 ```
 
 ## Security Considerations
