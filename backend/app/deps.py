@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
@@ -10,7 +11,7 @@ bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_current_merchant(
-    creds: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    creds: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ):  # type: ignore[no-untyped-def]
     if not creds:

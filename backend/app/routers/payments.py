@@ -56,8 +56,7 @@ def generate_xrp_payment_address(merchant_id: int, payment_id: int):  # type: ig
     For production, you should use your own XRP wallet address.
     Here we generate a destination tag based on merchant and payment IDs.
     """
-    # TODO: Replace with your actual XRP wallet address
-    # In production, this should be stored securely and retrieved from config
+    # In production, ensure XRP_WALLET_ADDRESS is set in environment variables
     xrp_wallet_address = settings.XRP_WALLET_ADDRESS if hasattr(settings, 'XRP_WALLET_ADDRESS') else ""
     
     if not xrp_wallet_address:
@@ -85,8 +84,7 @@ def convert_usd_to_xrp(usd_amount: float):  # type: ignore[no-untyped-def]
     In production, you should fetch live rates from an exchange API.
     For now, we'll use a placeholder rate.
     """
-    # TODO: Implement real-time XRP/USD rate fetching
-    # Example: Fetch from CoinGecko, Binance, or XRP Ledger
+    # Note: For production, implement real-time rate fetching from CoinGecko, Binance, or XRP Ledger
     # For now, using a default rate (update with real API)
     try:
         # Try to fetch from CoinGecko API
@@ -216,7 +214,7 @@ def get_payment(
 @router.post("/payments/webhook")
 def payment_webhook(request_data: dict, db: Session = Depends(get_db)):  # type: ignore[no-untyped-def]
     """Handle payment webhooks from NOWPayments"""
-    # TODO: Implement webhook verification and processing
+    # Note: Implement webhook signature verification and payment status updates
     # For NOWPayments, verify IPN signature
     # For XRP, this would be called by your XRP monitoring service
     pass

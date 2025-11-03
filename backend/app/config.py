@@ -1,5 +1,7 @@
-from pydantic_settings import BaseSettings
+import os
+
 from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -34,11 +36,13 @@ class Settings(BaseSettings):
     @field_validator("JWT_SECRET", mode="before")
     @classmethod
     def validate_jwt_secret(cls, v: str) -> str:
-        # Allow short secrets for testing
-        import os
-        if os.getenv("TESTING") == "true":
-            return v if v else "test_secret_key_for_testing_only_change_in_production"
-        if v == "change_me" or (len(v) < 32 if v else False):
+        """Validate JWT_SECRET with relaxed rules for testing environment."""
+        testing = os.getenv("TESTING", "").lower() == "true"
+        if testing:
+            if not v or v == "change_me":
+                return "test_secret_key_for_testing_only_change_in_production_min_32_chars"
+            return v
+        if not v or v == "change_me" or len(v) < 32:
             raise ValueError("JWT_SECRET must be at least 32 characters and not the default value")
         return v
 
