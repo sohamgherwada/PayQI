@@ -50,6 +50,7 @@ class PaymentOut(BaseModel):
     provider: str
     provider_invoice_id: Optional[str]
     pay_address: Optional[str]
+    checkout_url: Optional[str]
     tx_hash: Optional[str]
     created_at: datetime
 

@@ -28,6 +28,7 @@ class Payment(Base):
     provider = Column(String(32), nullable=False, default="nowpayments")
     provider_invoice_id = Column(String(128), index=True)
     pay_address = Column(String(256))
+    checkout_url = Column(String(512))
     tx_hash = Column(String(256))
     raw_payload = Column(Text)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

@@ -1,0 +1,45 @@
+name: Ruby Tests
+
+on:
+  workflow_call:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'ruby_services/**'
+      - '.github/workflows/ruby-tests.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'ruby_services/**'
+      - '.github/workflows/ruby-tests.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: ['3.2', '3.3']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Ruby ${{ matrix.ruby-version }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: true
+
+    - name: Install dependencies
+      working-directory: ./ruby_services
+      run: bundle install
+
+    - name: Run RSpec tests
+      working-directory: ./ruby_services
+      env:
+        NOWPAYMENTS_IPN_SECRET: 'test_secret'
+        PYTHON_API_URL: 'http://localhost:8000'
+      run: bundle exec rspec spec/ --format documentation
+
+    - name: Run RuboCop
+      working-directory: ./ruby_services
+      run: bundle exec rubocop || true
