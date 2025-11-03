@@ -1,51 +1,58 @@
+import os
+import sys
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-import os
-import sys
 
-# Set testing environment
+# Set testing environment BEFORE any imports
 os.environ["TESTING"] = "true"
 os.environ["JWT_SECRET"] = "test_secret_key_for_testing_32chars_minimum_required_here"
-os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+
+# Use DATABASE_URL from environment if provided (for CI), otherwise use SQLite
+_test_db_url = os.getenv("DATABASE_URL", "sqlite:///:memory:")
+if _test_db_url.startswith("postgresql"):
+    # PostgreSQL for CI - use connection pooling
+    os.environ["DATABASE_URL"] = _test_db_url
+    test_engine = create_engine(
+        _test_db_url,
+        poolclass=StaticPool,
+        pool_pre_ping=True,
+    )
+    _is_postgresql = True
+else:
+    # SQLite for local testing - in-memory
+    os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+    test_engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    _is_postgresql = False
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.database import Base, get_db, engine
+from app.database import Base, get_db
 from app.main import app
 from app.models import Merchant, Payment
 from app.security import hash_password, create_access_token
 
-# Override the database engine for testing
-from app.config import settings
-settings.DATABASE_URL = "sqlite:///:memory:"
-
-
-# Test database URL (use in-memory SQLite for testing)
-TEST_DATABASE_URL = "sqlite:///:memory:"
-
-engine = create_engine(
-    TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
 
 @pytest.fixture(scope="function")
 def db():
     """Create a fresh database for each test"""
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=test_engine)
     db = TestingSessionLocal()
     try:
         yield db
     finally:
         db.close()
-        Base.metadata.drop_all(bind=engine)
+        Base.metadata.drop_all(bind=test_engine)
 
 
 @pytest.fixture(scope="function")
