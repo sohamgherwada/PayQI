@@ -8,15 +8,20 @@ import sys
 
 # Set testing environment
 os.environ["TESTING"] = "true"
-os.environ["JWT_SECRET"] = "test_secret_key_for_testing_only_change_in_production_min_32_chars"
+os.environ["JWT_SECRET"] = "test_secret_key_for_testing_32chars_minimum_required_here"
+os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.database import Base, get_db
+from app.database import Base, get_db, engine
 from app.main import app
 from app.models import Merchant, Payment
 from app.security import hash_password, create_access_token
+
+# Override the database engine for testing
+from app.config import settings
+settings.DATABASE_URL = "sqlite:///:memory:"
 
 
 # Test database URL (use in-memory SQLite for testing)
