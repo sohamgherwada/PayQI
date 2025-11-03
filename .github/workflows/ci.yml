@@ -7,18 +7,18 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  # Main CI job that depends on all quality checks
-  ci:
-    runs-on: ubuntu-latest
-    needs: [python-tests, ruby-tests, code-quality, security]
-    if: always()
-    steps:
-    - name: CI Status
-      run: |
-        if [ "${{ needs.python-tests.result }}" != "success" ] || \
-           [ "${{ needs.ruby-tests.result }}" != "success" ] || \
-           [ "${{ needs.code-quality.result }}" != "success" ]; then
-          echo "CI checks failed"
-          exit 1
-        fi
-        echo "? All CI checks passed!"
+  python-tests:
+    uses: ./.github/workflows/python-tests.yml
+    secrets: inherit
+
+  ruby-tests:
+    uses: ./.github/workflows/ruby-tests.yml
+    secrets: inherit
+
+  code-quality:
+    uses: ./.github/workflows/code-quality.yml
+    secrets: inherit
+
+  security:
+    uses: ./.github/workflows/security.yml
+    secrets: inherit
