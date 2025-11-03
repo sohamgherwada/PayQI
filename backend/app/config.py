@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from pydantic import Field, field_validator
+import os
 
 
 class Settings(BaseSettings):
@@ -31,21 +32,13 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")
     
-<<<<<<< Current (Your changes)
-    @field_validator("JWT_SECRET")
-    @classmethod
-    def validate_jwt_secret(cls, v: str) -> str:
-        if v == "change_me" or len(v) < 32:
-=======
     @field_validator("JWT_SECRET", mode="before")
     @classmethod
     def validate_jwt_secret(cls, v: str) -> str:
         # Allow short secrets for testing
-        import os
         if os.getenv("TESTING") == "true":
             return v if v else "test_secret_key_for_testing_only_change_in_production"
         if v == "change_me" or (len(v) < 32 if v else False):
->>>>>>> Incoming (Background Agent changes)
             raise ValueError("JWT_SECRET must be at least 32 characters and not the default value")
         return v
 
@@ -55,5 +48,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore[call-arg]
-
-

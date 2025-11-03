@@ -317,6 +317,18 @@ For production XRP payment verification:
 ??? README.md
 ```
 
+## For Businesses: Integration Made Easy
+
+PayQI is designed to be simple and safe for businesses to integrate. We provide:
+
+- ?? **Complete Documentation** - [Integration Guide](docs/INTEGRATION.md) | [Quick Start](docs/QUICK_START.md)
+- ?? **Easy Integration** - Official SDKs for Python, Ruby, JavaScript, and PHP
+- ?? **Security First** - Built-in security features, webhook verification, and best practices
+- ?? **Code Examples** - Real-world examples for e-commerce, subscriptions, and more
+- ?? **5-Minute Setup** - Get started in minutes, not days
+
+**Ready to integrate?** See our [Business Setup Guide](SETUP_GUIDE.md) or [Quick Start Guide](docs/QUICK_START.md).
+
 ## Ruby Services
 
 PayQI includes Ruby microservices demonstrating Shopify-relevant skills:

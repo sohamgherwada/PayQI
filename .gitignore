@@ -89,4 +89,6 @@ coverage/
 # Application specific
 *.pyc
 .python-version
-.ruby-version
+
+# Keep .ruby-version for Ruby version management
+# .ruby-version
