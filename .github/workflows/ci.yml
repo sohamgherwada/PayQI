@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Main CI job that depends on all quality checks
+  ci:
+    runs-on: ubuntu-latest
+    needs: [python-tests, ruby-tests, code-quality, security]
+    if: always()
+    steps:
+    - name: CI Status
+      run: |
+        if [ "${{ needs.python-tests.result }}" != "success" ] || \
+           [ "${{ needs.ruby-tests.result }}" != "success" ] || \
+           [ "${{ needs.code-quality.result }}" != "success" ]; then
+          echo "CI checks failed"
+          exit 1
+        fi
+        echo "? All CI checks passed!"

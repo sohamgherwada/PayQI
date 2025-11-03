@@ -1,5 +1,12 @@
 # PayQI - Stripe for Crypto
 
+[![Python Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/python-tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/python-tests.yml)
+[![Ruby Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ruby-tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ruby-tests.yml)
+[![Integration Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/integration-tests.yml)
+[![Code Quality](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/code-quality.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/code-quality.yml)
+[![Security Scanning](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/security.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/security.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 PayQI is a modern payment gateway API that enables merchants to accept cryptocurrency payments, including Bitcoin, Ethereum, XRP, and other major cryptocurrencies. Built with FastAPI, it provides a Stripe-like experience for crypto payments.
 
 ## Features
@@ -467,17 +474,54 @@ The API includes basic rate limiting (100 requests per minute per IP). This can 
 limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
 ```
 
+## CI/CD Pipeline
+
+PayQI uses GitHub Actions for continuous integration and deployment:
+
+- **Automated Testing** - Python and Ruby tests run on every push and PR
+- **Code Quality** - Automated linting and formatting checks
+- **Security Scanning** - Dependency and vulnerability scanning
+- **Docker Builds** - Automated Docker image builds
+- **Integration Tests** - Full end-to-end API testing
+
+See [`.github/workflows/`](.github/workflows/) for all workflows.
+
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+Quick start:
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Make your changes and add tests
+4. Run `make test` and `make lint`
+5. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## Development Tools
+
+```bash
+# Install pre-commit hooks
+pip install pre-commit
+pre-commit install
+
+# Run all tests
+make test
+
+# Format code
+make format
+
+# Lint code
+make lint
+
+# Security checks
+make security-check
+```
 
 ## License
 
-[Specify your license here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 

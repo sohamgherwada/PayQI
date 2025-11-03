@@ -1,0 +1,64 @@
+name: Code Quality
+
+on:
+  workflow_call:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - 'ruby_services/**'
+      - '.github/workflows/code-quality.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - 'ruby_services/**'
+      - '.github/workflows/code-quality.yml'
+
+jobs:
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install linting dependencies
+      working-directory: ./backend
+      run: |
+        pip install black isort flake8 mypy types-all
+
+    - name: Check code formatting with Black
+      working-directory: ./backend
+      run: black --check app/ tests/
+
+    - name: Check import sorting with isort
+      working-directory: ./backend
+      run: isort --check-only app/ tests/
+
+    - name: Run Flake8
+      working-directory: ./backend
+      run: flake8 app/ tests/ --max-line-length=120 --extend-ignore=E203,W503
+
+    - name: Type checking with mypy
+      working-directory: ./backend
+      run: mypy app/ --ignore-missing-imports || true
+
+  ruby-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+        bundler-cache: true
+
+    - name: Run RuboCop
+      working-directory: ./ruby_services
+      run: bundle exec rubocop --parallel

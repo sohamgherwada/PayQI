@@ -1,0 +1,37 @@
+name: Integration Tests
+
+on:
+  workflow_call:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Start services
+      run: |
+        docker-compose up -d db backend
+        sleep 10
+
+    - name: Wait for API to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done'
+
+    - name: Run integration tests
+      run: |
+        chmod +x test_api.sh
+        API_URL=http://localhost:8000 ./test_api.sh
+
+    - name: Cleanup
+      if: always()
+      run: docker-compose down
