@@ -16,5 +16,3 @@ python-jose[cryptography]==3.3.0
 structlog==24.1.0
 redis==5.0.1
 cachetools==5.3.2
-
-
