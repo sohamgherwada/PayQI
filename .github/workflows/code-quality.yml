@@ -30,7 +30,7 @@ jobs:
     - name: Install linting dependencies
       working-directory: ./backend
       run: |
-        pip install black isort flake8 mypy types-all
+        pip install black isort flake8 mypy
 
     - name: Check code formatting with Black
       working-directory: ./backend
