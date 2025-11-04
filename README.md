@@ -1,10 +1,10 @@
 # PayQI - Stripe for Crypto
 
-[![Python Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/python-tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/python-tests.yml)
-[![Ruby Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ruby-tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ruby-tests.yml)
-[![Integration Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/integration-tests.yml)
-[![Code Quality](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/code-quality.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/code-quality.yml)
-[![Security Scanning](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/security.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/security.yml)
+[![Python Tests](https://github.com/sohamgherwada/PayQI/actions/workflows/python-tests.yml/badge.svg)](https://github.com/sohamgherwada/PayQI/actions/workflows/python-tests.yml)
+[![Ruby Tests](https://github.com/sohamgherwada/PayQI/actions/workflows/ruby-tests.yml/badge.svg)](https://github.com/sohamgherwada/PayQI/actions/workflows/ruby-tests.yml)
+[![Integration Tests](https://github.com/sohamgherwada/PayQI/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/sohamgherwada/PayQI/actions/workflows/integration-tests.yml)
+[![Code Quality](https://github.com/sohamgherwada/PayQI/actions/workflows/code-quality.yml/badge.svg)](https://github.com/sohamgherwada/PayQI/actions/workflows/code-quality.yml)
+[![Security Scanning](https://github.com/sohamgherwada/PayQI/actions/workflows/security.yml/badge.svg)](https://github.com/sohamgherwada/PayQI/actions/workflows/security.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 PayQI is a modern payment gateway API that enables merchants to accept cryptocurrency payments, including Bitcoin, Ethereum, XRP, and other major cryptocurrencies. Built with FastAPI, it provides a Stripe-like experience for crypto payments.
