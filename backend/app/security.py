@@ -5,7 +5,12 @@ from passlib.context import CryptContext
 from app.config import settings
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Configure CryptContext with explicit bcrypt settings to avoid version detection issues
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__rounds=12,
+)
 
 
 def hash_password(password: str) -> str:
