@@ -1,0 +1,52 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: payqi
+          POSTGRES_PASSWORD: payqi
+          POSTGRES_DB: payqi
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      working-directory: ./backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      working-directory: ./backend
+      env:
+        DATABASE_URL: postgresql+psycopg2://payqi:payqi@localhost:5432/payqi
+        JWT_SECRET: test-secret-key
+        JWT_EXPIRES_MINUTES: 60
+        NOWPAYMENTS_API_KEY: test-key
+        NOWPAYMENTS_IPN_SECRET: test-secret
+        BACKEND_CORS_ORIGINS: http://localhost:5173
+      run: |
+        pytest -v --tb=short
