@@ -30,38 +30,76 @@ jobs:
         BACKEND_CORS_ORIGINS=http://localhost:5173
         EOF
 
-    - name: Start services
+    - name: Install curl
       run: |
-        docker-compose up -d db backend
+        sudo apt-get update
+        sudo apt-get install -y curl
+
+    - name: Start database
+      run: |
+        docker-compose up -d db
+        docker-compose ps
         
-    - name: Wait for services to be ready
+    - name: Wait for database to be ready
       run: |
-        echo "Waiting for services to start..."
-        sleep 15
-        echo "Checking PostgreSQL..."
+        echo "Waiting for database..."
         for i in {1..30}; do
           if docker-compose exec -T db pg_isready -U payqi 2>/dev/null; then
-            echo "PostgreSQL is ready!"
-            break
+            echo "✓ Database is ready!"
+            sleep 3  # Give it a moment to fully initialize
+            exit 0
           fi
-          echo "Waiting for PostgreSQL... ($i/30)"
+          echo "Waiting for database... ($i/30)"
           sleep 2
         done
+        echo "✗ Database failed to start"
+        docker-compose logs db
+        exit 1
         
-        echo "Checking API..."
-        for i in {1..30}; do
+    - name: Start backend
+      run: |
+        docker-compose up -d backend
+        docker-compose ps
+        sleep 5  # Give backend time to start
+        
+    - name: Wait for API
+      run: |
+        echo "Waiting for API..."
+        for i in {1..60}; do
           if curl -f http://localhost:8000/health 2>/dev/null; then
-            echo "API is ready!"
-            break
+            echo "✓ API is ready!"
+            exit 0
           fi
-          echo "Waiting for API... ($i/30)"
+          echo "Waiting for API... ($i/60)"
           sleep 2
         done
+        echo "✗ API failed to start"
+        docker-compose logs backend
+        exit 1
+
+    - name: Verify API is responding
+      run: |
+        echo "Verifying API health..."
+        response=$(curl -s http://localhost:8000/health)
+        echo "Health response: $response"
+        if ! echo "$response" | grep -q "ok"; then
+          echo "✗ API health check failed"
+          docker-compose logs backend
+          exit 1
+        fi
+        echo "✓ API is healthy"
 
     - name: Run integration tests
       run: |
         chmod +x test_api.sh
+        set +e  # Don't exit on error immediately
         API_URL=http://localhost:8000 ./test_api.sh
+        TEST_EXIT=$?
+        if [ $TEST_EXIT -ne 0 ]; then
+          echo "Test script exited with code: $TEST_EXIT"
+          docker-compose logs backend
+          exit $TEST_EXIT
+        fi
 
     - name: Show logs on failure
       if: failure()
