@@ -37,14 +37,14 @@ jobs:
 
     - name: Start database
       run: |
-        docker-compose up -d db
-        docker-compose ps
+        docker compose up -d db
+        docker compose ps
         
     - name: Wait for database to be ready
       run: |
         echo "Waiting for database..."
         for i in {1..30}; do
-          if docker-compose exec -T db pg_isready -U payqi 2>/dev/null; then
+          if docker compose exec -T db pg_isready -U payqi 2>/dev/null; then
             echo "✓ Database is ready!"
             sleep 3  # Give it a moment to fully initialize
             exit 0
@@ -53,13 +53,13 @@ jobs:
           sleep 2
         done
         echo "✗ Database failed to start"
-        docker-compose logs db
+        docker compose logs db
         exit 1
         
     - name: Start backend
       run: |
-        docker-compose up -d backend
-        docker-compose ps
+        docker compose up -d backend
+        docker compose ps
         sleep 5  # Give backend time to start
         
     - name: Wait for API
@@ -74,7 +74,7 @@ jobs:
           sleep 2
         done
         echo "✗ API failed to start"
-        docker-compose logs backend
+        docker compose logs backend
         exit 1
 
     - name: Verify API is responding
@@ -84,7 +84,7 @@ jobs:
         echo "Health response: $response"
         if ! echo "$response" | grep -q "ok"; then
           echo "✗ API health check failed"
-          docker-compose logs backend
+          docker compose logs backend
           exit 1
         fi
         echo "✓ API is healthy"
@@ -97,7 +97,7 @@ jobs:
         TEST_EXIT=$?
         if [ $TEST_EXIT -ne 0 ]; then
           echo "Test script exited with code: $TEST_EXIT"
-          docker-compose logs backend
+          docker compose logs backend
           exit $TEST_EXIT
         fi
 
@@ -105,10 +105,10 @@ jobs:
       if: failure()
       run: |
         echo "=== Backend Logs ==="
-        docker-compose logs backend || true
+        docker compose logs backend || true
         echo "=== Database Logs ==="
-        docker-compose logs db || true
+        docker compose logs db || true
 
     - name: Cleanup
       if: always()
-      run: docker-compose down -v
+      run: docker compose down -v
