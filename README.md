@@ -539,14 +539,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For issues and questions:
 - Open an issue on GitHub
-- Contact: [your-email@example.com]
-
-## Roadmap
-
-- [ ] Enhanced XRP transaction monitoring
-- [ ] Support for more cryptocurrencies
-- [ ] Webhook system for payment status updates
-- [ ] Admin dashboard
-- [ ] Mobile SDKs
-- [ ] Recurring payments/subscriptions
-- [ ] Multi-signature wallet support
+- Contact: [sohamgherwada@gmail.com]
