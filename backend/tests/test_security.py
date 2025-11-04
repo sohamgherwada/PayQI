@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta, timezone
+
 import pytest
-from app.security import hash_password, verify_password, create_access_token, decode_token
-from datetime import datetime, timezone, timedelta
+from app.security import create_access_token, decode_token, hash_password, verify_password
 
 
 class TestSecurity:
@@ -47,8 +48,9 @@ class TestSecurity:
 
     def test_token_expiration(self):
         """Test token expiration"""
-        from app.security import create_access_token
         import time
+
+        from app.security import create_access_token
 
         # Create token with 1 second expiration
         token = create_access_token(subject="test@example.com", expires_minutes=0.0001)

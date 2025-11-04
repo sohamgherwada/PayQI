@@ -1,6 +1,7 @@
+from decimal import Decimal
+
 import pytest
 from fastapi import status
-from decimal import Decimal
 
 
 class TestTransactions:
@@ -68,9 +69,10 @@ class TestTransactions:
 
     def test_get_transactions_only_own(self, client, db, test_merchant):
         """Test that merchants only see their own transactions"""
-        from app.models import Merchant, Payment
-        from app.security import hash_password, create_access_token
         from decimal import Decimal
+
+        from app.models import Merchant, Payment
+        from app.security import create_access_token, hash_password
 
         # Create another merchant with payment
         other_merchant = Merchant(

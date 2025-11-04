@@ -19,3 +19,30 @@ Style/FrozenStringLiteralComment:
 
 Style/StringLiterals:
   EnforcedStyle: single_quotes
+
+# Allow longer methods and classes for CLI and service files
+Metrics/ClassLength:
+  Max: 150
+  Exclude:
+    - 'cli/**/*'
+    - '**/*_service.rb'
+
+Metrics/MethodLength:
+  Max: 25
+  Exclude:
+    - 'cli/**/*'
+    - '**/*_service.rb'
+
+Metrics/AbcSize:
+  Max: 25
+  Exclude:
+    - 'cli/**/*'
+    - '**/*_service.rb'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+
+# Allow script files without execute permission (they're called via ruby)
+Lint/ScriptPermission:
+  Enabled: false

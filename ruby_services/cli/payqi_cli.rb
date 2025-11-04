@@ -7,7 +7,8 @@ require 'dotenv'
 require_relative '../lib/payqi_client'
 
 # Add lib to path for standalone execution
-$LOAD_PATH.unshift(File.dirname(__FILE__) + '/../lib') unless $LOAD_PATH.include?(File.dirname(__FILE__) + '/../lib')
+lib_path = "#{File.dirname(__FILE__)}/../lib"
+$LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
 
 Dotenv.load
 
@@ -17,7 +18,7 @@ class PayQICLI < Thor
   desc 'register EMAIL PASSWORD', 'Register a new merchant account'
   def register(email, password)
     client = PayQI::Client.new
-    
+
     begin
       merchant = client.register(email: email, password: password)
       say "? Successfully registered merchant: #{merchant['email']}", :green
@@ -31,19 +32,21 @@ class PayQICLI < Thor
   desc 'login EMAIL PASSWORD', 'Login and get access token'
   def login(email, password)
     client = PayQI::Client.new
-    
+
     begin
       result = client.login(email: email, password: password)
       token = result['access_token']
-      
-      say "? Login successful!", :green
+
+      say '? Login successful!', :green
       say "\nAccess Token:", :cyan
       say token, :yellow
       say "\n?? Save this token: export PAYQI_TOKEN='#{token}'", :cyan
-      
+
       # Save to .env file
-      File.open('.env', 'a') { |f| f.puts "PAYQI_TOKEN=#{token}\n" } unless File.readlines('.env').any? { |line| line.include?('PAYQI_TOKEN') }
-      
+      unless File.readlines('.env').any? { |line| line.include?('PAYQI_TOKEN') }
+        File.open('.env', 'a') { |f| f.puts "PAYQI_TOKEN=#{token}\n" }
+      end
+
     rescue PayQI::APIError => e
       say "? Error: #{e.message}", :red
       exit 1
@@ -74,7 +77,7 @@ class PayQICLI < Thor
       say "  Status: #{result['status']}", :yellow
       say "  Currency: #{currency}", :yellow
       say "  Amount: $#{amount}", :yellow
-      
+
       if result['pay_address']
         say "\nPayment Address:", :cyan
         say "  #{result['pay_address']}", :yellow
@@ -82,9 +85,9 @@ class PayQICLI < Thor
 
       if result['provider_invoice_id'] && currency == 'XRP'
         say "\n?? XRP Payment Instructions:", :cyan
-        say "  Send XRP to the address above with destination tag: #{result['provider_invoice_id'].split('_').last}", :yellow
+        tag = result['provider_invoice_id'].split('_').last
+        say "  Send XRP to the address above with destination tag: #{tag}", :yellow
       end
-
     rescue PayQI::APIError => e
       say "? Error: #{e.message}", :red
       exit 1
@@ -103,17 +106,14 @@ class PayQICLI < Thor
 
     begin
       result = client.get_payment(payment_id: payment_id, access_token: token)
-      
+
       say "\nPayment Status:", :cyan
       say "  ID: #{result['id']}", :yellow
       say "  Status: #{result['status']}", :yellow
       say "  Amount: #{result['amount']} #{result['currency']}", :yellow
       say "  Created: #{result['created_at']}", :yellow
-      
-      if result['tx_hash']
-        say "  Transaction Hash: #{result['tx_hash']}", :yellow
-      end
 
+      say "  Transaction Hash: #{result['tx_hash']}", :yellow if result['tx_hash']
     rescue PayQI::APIError => e
       say "? Error: #{e.message}", :red
       exit 1
@@ -135,7 +135,7 @@ class PayQICLI < Thor
       payments = result['items']
 
       if payments.empty?
-        say "No transactions found.", :yellow
+        say 'No transactions found.', :yellow
         return
       end
 
@@ -144,10 +144,10 @@ class PayQICLI < Thor
 
       payments.each do |payment|
         status_color = payment['status'] == 'completed' ? :green : :yellow
-        say "  #{payment['id']}. #{payment['amount']} #{payment['currency']} - #{payment['status'].upcase}", status_color
+        status_text = payment['status'].upcase
+        say "  #{payment['id']}. #{payment['amount']} #{payment['currency']} - #{status_text}", status_color
         say "     Created: #{payment['created_at']}", :white
       end
-
     rescue PayQI::APIError => e
       say "? Error: #{e.message}", :red
       exit 1
@@ -166,13 +166,14 @@ class PayQICLI < Thor
 
     begin
       result = client.get_merchant(access_token: token)
-      
+
       say "\n?? Merchant Information:", :cyan
       say "  ID: #{result['id']}", :yellow
       say "  Email: #{result['email']}", :yellow
-      say "  KYC Verified: #{result['kyc_verified'] ? '?' : '?'}", result['kyc_verified'] ? :green : :yellow
+      kyc_status = result['kyc_verified'] ? '?' : '?'
+      kyc_color = result['kyc_verified'] ? :green : :yellow
+      say "  KYC Verified: #{kyc_status}", kyc_color
       say "  Created: #{result['created_at']}", :yellow
-
     rescue PayQI::APIError => e
       say "? Error: #{e.message}", :red
       exit 1
@@ -181,7 +182,7 @@ class PayQICLI < Thor
 
   desc 'version', 'Show version'
   def version
-    say "PayQI CLI v1.0.0", :cyan
+    say 'PayQI CLI v1.0.0', :cyan
   end
 end
 

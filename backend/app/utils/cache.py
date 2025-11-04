@@ -1,8 +1,9 @@
-from cachetools import TTLCache
-from typing import Optional, Any
-from app.config import settings
-import redis
 import json
+from typing import Any, Optional
+
+import redis
+from app.config import settings
+from cachetools import TTLCache
 
 # In-memory cache fallback
 _memory_cache: Optional[TTLCache] = None

@@ -1,10 +1,10 @@
+from app.database import get_db
+from app.deps import get_current_merchant
+from app.models import Merchant
+from app.schemas import LoginRequest, MerchantOut, RegisterRequest, TokenResponse
+from app.security import create_access_token, hash_password, verify_password
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.models import Merchant
-from app.schemas import RegisterRequest, LoginRequest, TokenResponse, MerchantOut
-from app.security import hash_password, verify_password, create_access_token
-from app.deps import get_current_merchant
 
 router = APIRouter()
 

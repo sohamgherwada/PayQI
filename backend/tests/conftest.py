@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from app.database import Base, get_db
 from app.main import app
 from app.models import Merchant, Payment
-from app.security import hash_password, create_access_token
+from app.security import create_access_token, hash_password
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 

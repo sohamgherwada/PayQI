@@ -1,6 +1,7 @@
-import structlog
 import sys
 from typing import Any
+
+import structlog
 from app.config import settings
 
 # Configure structured logging

@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-import jwt
-from passlib.context import CryptContext
-from app.config import settings
 
+import jwt
+from app.config import settings
+from passlib.context import CryptContext
 
 # Configure CryptContext with explicit bcrypt settings to avoid version detection issues
 pwd_context = CryptContext(

@@ -1,6 +1,7 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 from fastapi import status
-from unittest.mock import patch, MagicMock
 
 
 class TestPayments:
@@ -72,9 +73,10 @@ class TestPayments:
 
     def test_get_payment_other_merchant(self, client, db, test_merchant):
         """Test getting payment from different merchant (should fail)"""
-        from app.models import Merchant, Payment
         from decimal import Decimal
-        from app.security import hash_password, create_access_token
+
+        from app.models import Merchant, Payment
+        from app.security import create_access_token, hash_password
 
         # Create another merchant
         other_merchant = Merchant(

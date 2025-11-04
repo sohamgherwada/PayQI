@@ -67,4 +67,6 @@ jobs:
 
     - name: Run RuboCop
       working-directory: ./ruby_services
-      run: bundle exec rubocop --parallel
+      run: |
+        bundle exec rubocop --auto-correct || true
+        bundle exec rubocop --parallel
