@@ -80,9 +80,15 @@ async def create_payment(
     except httpx.HTTPStatusError as e:
         payment.status = "failed"
         db.commit()
+        error_detail = ""
+        try:
+            if hasattr(e, 'response') and e.response is not None:
+                error_detail = e.response.text
+        except Exception:
+            error_detail = str(e)
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Payment provider error: {e.response.text if hasattr(e, 'response') else str(e)}"
+            detail=f"Payment provider error: {error_detail}"
         )
     except Exception as e:
         payment.status = "failed"
