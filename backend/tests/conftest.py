@@ -35,10 +35,10 @@ else:
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from app.database import Base, get_db
-from app.main import app
-from app.models import Merchant, Payment
-from app.security import create_access_token, hash_password
+from app.database import Base, get_db  # noqa: E402
+from app.main import app  # noqa: E402
+from app.models import Merchant, Payment  # noqa: E402
+from app.security import create_access_token, hash_password  # noqa: E402
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 

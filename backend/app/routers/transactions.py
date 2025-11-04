@@ -1,7 +1,7 @@
 from app.database import get_db
 from app.deps import get_current_merchant
 from app.models import Merchant, Payment
-from app.schemas import PaymentOut, TransactionsResponse
+from app.schemas import TransactionsResponse
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 

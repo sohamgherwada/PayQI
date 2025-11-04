@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-import pytest
 from fastapi import status
 
 

@@ -8,6 +8,7 @@ require 'faraday'
 require 'logger'
 require 'openssl'
 require 'rack/protection'
+require 'rack/timeout'
 
 Dotenv.load
 
