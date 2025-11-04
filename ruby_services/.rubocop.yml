@@ -1,0 +1,21 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.2
+  SuggestExtensions: false
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'cli/payqi_cli.rb'
+
+Metrics/ClassLength:
+  Max: 160
+
+Metrics/MethodLength:
+  Max: 35
+
+Metrics/AbcSize:
+  Max: 35
+
+Style/Documentation:
+  Enabled: false

@@ -1,5 +1,4 @@
 import pytest
-
 from app.security import create_access_token, decode_token, hash_password, verify_password
 
 

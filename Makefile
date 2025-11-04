@@ -26,9 +26,9 @@ lint: lint-python lint-ruby ## Lint all code
 	@echo "? Linting complete!"
 
 lint-python: ## Lint Python code
-	cd backend && black --check app/ tests/
-	cd backend && isort --check-only app/ tests/
-	cd backend && flake8 app/ tests/
+	cd backend && python3 -m black --check app/ tests/
+	cd backend && python3 -m isort --check-only app/ tests/
+	cd backend && python3 -m flake8 app/ tests/
 
 lint-ruby: ## Lint Ruby code
 	cd ruby_services && bundle exec rubocop
@@ -37,8 +37,8 @@ format: format-python format-ruby ## Format all code
 	@echo "? Formatting complete!"
 
 format-python: ## Format Python code
-	cd backend && black app/ tests/
-	cd backend && isort app/ tests/
+	cd backend && python3 -m black app/ tests/
+	cd backend && python3 -m isort app/ tests/
 
 format-ruby: ## Format Ruby code
 	cd ruby_services && bundle exec rubocop -a

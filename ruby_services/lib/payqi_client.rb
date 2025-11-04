@@ -13,8 +13,8 @@ module PayQI
     def initialize(api_url: ENV['PAYQI_API_URL'] || 'http://localhost:8000', access_token: nil)
       @api_url = api_url
       @access_token = access_token
-      @logger = Logger.new(STDOUT)
-      
+      @logger = Logger.new($stdout)
+
       @conn = Faraday.new(url: @api_url) do |faraday|
         faraday.request :json
         faraday.response :json, content_type: /\bjson$/
@@ -73,12 +73,31 @@ module PayQI
     private
 
     def handle_response(response)
+      parsed_body = normalize_body(response.body)
+
       if response.success?
-        response.body
+        parsed_body
       else
-        error_message = response.body['detail'] || response.body['error'] || 'Unknown error'
+        error_message = if parsed_body.is_a?(Hash)
+                          parsed_body['detail'] || parsed_body['error'] || parsed_body['message'] || parsed_body.to_s
+                        else
+                          parsed_body.to_s
+                        end
         raise APIError.new(error_message, response.status)
       end
+    end
+
+    def normalize_body(body)
+      case body
+      when String
+        JSON.parse(body)
+      when Hash, Array
+        JSON.parse(JSON.generate(body))
+      else
+        body
+      end
+    rescue JSON::ParserError
+      body
     end
   end
 

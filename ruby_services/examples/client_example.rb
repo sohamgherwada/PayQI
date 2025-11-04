@@ -13,8 +13,8 @@ Dotenv.load
 api_url = ENV.fetch('PAYQI_API_URL', 'http://localhost:8000')
 client = PayQI::Client.new(api_url: api_url)
 
-puts "?? PayQI Ruby Client Example"
-puts "=" * 50
+puts '?? PayQI Ruby Client Example'
+puts '=' * 50
 
 begin
   # Example: Register a new merchant
@@ -41,11 +41,11 @@ begin
     currency: 'XRP',
     access_token: token
   )
-  puts "? Payment created!"
+  puts '? Payment created!'
   puts "   Payment ID: #{payment['payment_id']}"
   puts "   Status: #{payment['status']}"
   puts "   Address: #{payment['pay_address']}"
-  
+
   if payment['provider_invoice_id']
     tag = payment['provider_invoice_id'].split('_').last
     puts "   Destination Tag: #{tag}"
@@ -57,7 +57,7 @@ begin
     payment_id: payment['payment_id'],
     access_token: token
   )
-  puts "? Payment details:"
+  puts '? Payment details:'
   puts "   Amount: #{payment_details['amount']} #{payment_details['currency']}"
   puts "   Status: #{payment_details['status']}"
 
@@ -72,10 +72,9 @@ begin
   # Example: Get merchant info
   puts "\n6. Getting merchant info..."
   merchant_info = client.get_merchant(access_token: token)
-  puts "? Merchant Info:"
+  puts '? Merchant Info:'
   puts "   Email: #{merchant_info['email']}"
   puts "   KYC Verified: #{merchant_info['kyc_verified'] ? 'Yes' : 'No'}"
-
 rescue PayQI::APIError => e
   puts "? API Error (#{e.status_code}): #{e.message}"
 rescue StandardError => e
@@ -83,5 +82,5 @@ rescue StandardError => e
   puts e.backtrace.first(3)
 end
 
-puts "\n" + "=" * 50
-puts "? Example complete!"
+puts "\n#{'=' * 50}"
+puts '? Example complete!'

@@ -8,7 +8,7 @@ require 'faraday'
 require 'logger'
 require 'openssl'
 require 'rack/protection'
-require 'rack/timeout'
+require 'rack-timeout'
 
 Dotenv.load
 
@@ -19,16 +19,16 @@ class WebhookService < Sinatra::Base
     set :logging, true
     set :dump_errors, true
     set :show_exceptions, false
-    
+
     # Security settings
-    use Rack::Protection
+    set :protection, except: [:session_hijacking]
     use Rack::Protection::JsonCsrf
     use Rack::Timeout, service_timeout: 30
   end
 
   before do
     content_type 'application/json'
-    @logger = Logger.new(STDOUT)
+    @logger = Logger.new($stdout)
     @logger.level = Logger::INFO
     @logger.info("Request: #{request.request_method} #{request.path} from #{request.ip}")
   end
@@ -40,85 +40,82 @@ class WebhookService < Sinatra::Base
 
   # Process NOWPayments webhook
   post '/webhooks/nowpayments' do
-    begin
-      payload = request.body.read
-      signature = request.env['HTTP_X_NOWPAYMENTS_SIG']
-      
-      @logger.info("Received NOWPayments webhook")
-      
-      # Verify webhook signature
-      unless verify_nowpayments_signature(payload, signature)
-        @logger.warn("Invalid webhook signature")
-        halt 401, { error: 'Invalid signature' }.to_json
-      end
+    payload = request.body.read
+    data = JSON.parse(payload)
+    signature = request.env['HTTP_X_NOWPAYMENTS_SIG']
 
-      data = JSON.parse(payload)
-      @logger.info("Processing payment webhook: #{data['payment_id']}")
-      
-      # Process the webhook asynchronously (in production, use background jobs)
-      process_nowpayments_webhook(data)
-      
-      { status: 'ok', message: 'Webhook processed' }.to_json
-    rescue JSON::ParserError => e
-      @logger.error("Invalid JSON: #{e.message}")
-      halt 400, { error: 'Invalid JSON' }.to_json
-    rescue StandardError => e
-      @logger.error("Error processing webhook: #{e.message}")
-      halt 500, { error: 'Internal server error' }.to_json
+    @logger.info('Received NOWPayments webhook')
+
+    # Verify webhook signature
+    unless verify_nowpayments_signature(payload, signature)
+      @logger.warn('Invalid webhook signature')
+      halt 401, { error: 'Invalid signature' }.to_json
     end
+
+    @logger.info("Processing payment webhook: #{data['payment_id']}")
+
+    # Process the webhook asynchronously (in production, use background jobs)
+    process_nowpayments_webhook(data)
+
+    { status: 'ok', message: 'Webhook processed' }.to_json
+  rescue JSON::ParserError => e
+    @logger.error("Invalid JSON: #{e.message}")
+    halt 400, { error: 'Invalid JSON' }.to_json
+  rescue StandardError => e
+    @logger.error("Error processing webhook: #{e.message}")
+    halt 500, { error: 'Internal server error' }.to_json
   end
 
   # Process XRP payment webhook (from monitoring service)
   post '/webhooks/xrp' do
-    begin
-      payload = request.body.read
-      data = JSON.parse(payload)
-      
-      @logger.info("Received XRP webhook for transaction: #{data['tx_hash']}")
-      
-      # Verify XRP transaction
-      unless verify_xrp_transaction(data)
-        @logger.warn("Invalid XRP transaction data")
-        halt 400, { error: 'Invalid transaction data' }.to_json
-      end
+    payload = request.body.read
+    data = JSON.parse(payload)
 
-      # Process XRP payment
-      process_xrp_payment(data)
-      
-      { status: 'ok', message: 'XRP payment processed' }.to_json
-    rescue JSON::ParserError => e
-      @logger.error("Invalid JSON: #{e.message}")
-      halt 400, { error: 'Invalid JSON' }.to_json
-    rescue StandardError => e
-      @logger.error("Error processing XRP webhook: #{e.message}")
-      halt 500, { error: 'Internal server error' }.to_json
+    @logger.info("Received XRP webhook for transaction: #{data['tx_hash']}")
+
+    # Verify XRP transaction
+    unless verify_xrp_transaction(data)
+      @logger.warn('Invalid XRP transaction data')
+      halt 400, { error: 'Invalid transaction data' }.to_json
     end
+
+    # Process XRP payment
+    process_xrp_payment(data)
+
+    { status: 'ok', message: 'XRP payment processed' }.to_json
+  rescue JSON::ParserError => e
+    @logger.error("Invalid JSON: #{e.message}")
+    halt 400, { error: 'Invalid JSON' }.to_json
+  rescue StandardError => e
+    @logger.error("Error processing XRP webhook: #{e.message}")
+    halt 500, { error: 'Internal server error' }.to_json
   end
 
   private
 
   def verify_nowpayments_signature(payload, signature)
-    return false unless signature && ENV['NOWPAYMENTS_IPN_SECRET']
-    
+    secret = ENV.fetch('NOWPAYMENTS_IPN_SECRET', nil)
+    return false unless signature && secret
+
     expected_signature = OpenSSL::HMAC.hexdigest(
       OpenSSL::Digest.new('sha512'),
-      ENV['NOWPAYMENTS_IPN_SECRET'],
+      secret,
       payload
     )
-    
+
     Rack::Utils.secure_compare(expected_signature, signature)
   end
 
   def verify_xrp_transaction(data)
     # Verify XRP transaction structure
-    required_fields = ['tx_hash', 'destination_tag', 'amount', 'currency']
+    required_fields = %w[tx_hash destination_tag amount currency]
     required_fields.all? { |field| data.key?(field) } && data['currency'] == 'XRP'
   end
 
   def process_nowpayments_webhook(data)
     # Forward to Python API
     api_url = ENV.fetch('PYTHON_API_URL', 'http://backend:8000')
-    
+
     conn = Faraday.new(url: api_url) do |faraday|
       faraday.request :json
       faraday.response :logger, @logger
@@ -126,9 +123,9 @@ class WebhookService < Sinatra::Base
     end
 
     response = conn.post('/api/payments/webhook', data)
-    
+
     if response.success?
-      @logger.info("Successfully forwarded webhook to Python API")
+      @logger.info('Successfully forwarded webhook to Python API')
     else
       @logger.error("Failed to forward webhook: #{response.status}")
       raise "API error: #{response.status}"
@@ -138,7 +135,7 @@ class WebhookService < Sinatra::Base
   def process_xrp_payment(data)
     # Forward XRP payment to Python API for processing
     api_url = ENV.fetch('PYTHON_API_URL', 'http://backend:8000')
-    
+
     conn = Faraday.new(url: api_url) do |faraday|
       faraday.request :json
       faraday.response :logger, @logger
@@ -155,7 +152,7 @@ class WebhookService < Sinatra::Base
     }
 
     response = conn.post('/api/payments/webhook', webhook_data)
-    
+
     if response.success?
       @logger.info("Successfully processed XRP payment: #{data['tx_hash']}")
     else
@@ -165,4 +162,4 @@ class WebhookService < Sinatra::Base
   end
 end
 
-WebhookService.run! if __FILE__ == $0
+WebhookService.run! if __FILE__ == $PROGRAM_NAME

@@ -30,7 +30,7 @@ class MerchantOut(BaseModel):
 
 
 class CreatePaymentRequest(BaseModel):
-    amount: float
+    amount: float = Field(gt=0, description="Payment amount in USD; must be greater than zero")
     currency: str
 
 

@@ -13,7 +13,6 @@ class TestPayments:
             patch("app.routers.payments.generate_xrp_payment_address") as mock_addr,
             patch("app.config.settings") as mock_settings,
         ):
-
             from decimal import Decimal
 
             mock_settings.XRP_WALLET_ADDRESS = "rTestWallet123"

@@ -46,7 +46,6 @@ class PayQICLI < Thor
       unless File.readlines('.env').any? { |line| line.include?('PAYQI_TOKEN') }
         File.open('.env', 'a') { |f| f.puts "PAYQI_TOKEN=#{token}\n" }
       end
-
     rescue PayQI::APIError => e
       say "? Error: #{e.message}", :red
       exit 1
@@ -55,7 +54,7 @@ class PayQICLI < Thor
 
   desc 'payment AMOUNT CURRENCY', 'Create a new payment (requires PAYQI_TOKEN)'
   def payment(amount, currency)
-    token = ENV['PAYQI_TOKEN']
+    token = ENV.fetch('PAYQI_TOKEN', nil)
     unless token
       say "? Error: PAYQI_TOKEN not found. Run 'payqi login' first.", :red
       exit 1
@@ -96,7 +95,7 @@ class PayQICLI < Thor
 
   desc 'status PAYMENT_ID', 'Get payment status'
   def status(payment_id)
-    token = ENV['PAYQI_TOKEN']
+    token = ENV.fetch('PAYQI_TOKEN', nil)
     unless token
       say "? Error: PAYQI_TOKEN not found. Run 'payqi login' first.", :red
       exit 1
@@ -122,7 +121,7 @@ class PayQICLI < Thor
 
   desc 'transactions', 'List all transactions'
   def transactions
-    token = ENV['PAYQI_TOKEN']
+    token = ENV.fetch('PAYQI_TOKEN', nil)
     unless token
       say "? Error: PAYQI_TOKEN not found. Run 'payqi login' first.", :red
       exit 1
@@ -156,7 +155,7 @@ class PayQICLI < Thor
 
   desc 'merchant', 'Get current merchant info'
   def merchant
-    token = ENV['PAYQI_TOKEN']
+    token = ENV.fetch('PAYQI_TOKEN', nil)
     unless token
       say "? Error: PAYQI_TOKEN not found. Run 'payqi login' first.", :red
       exit 1
@@ -170,7 +169,7 @@ class PayQICLI < Thor
       say "\n?? Merchant Information:", :cyan
       say "  ID: #{result['id']}", :yellow
       say "  Email: #{result['email']}", :yellow
-      kyc_status = result['kyc_verified'] ? '?' : '?'
+      kyc_status = result['kyc_verified'] ? 'Yes' : 'Pending'
       kyc_color = result['kyc_verified'] ? :green : :yellow
       say "  KYC Verified: #{kyc_status}", kyc_color
       say "  Created: #{result['created_at']}", :yellow

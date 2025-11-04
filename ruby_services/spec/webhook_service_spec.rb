@@ -26,8 +26,9 @@ RSpec.describe WebhookService do
     end
 
     before do
-      allow(ENV).to receive(:[]).with('NOWPAYMENTS_IPN_SECRET').and_return(secret)
-      allow(ENV).to receive(:[]).with('PYTHON_API_URL').and_return('http://localhost:8000')
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('NOWPAYMENTS_IPN_SECRET', nil).and_return(secret)
+      allow(ENV).to receive(:fetch).with('PYTHON_API_URL', anything).and_return('http://localhost:8000')
     end
 
     context 'with valid signature' do
@@ -92,7 +93,8 @@ RSpec.describe WebhookService do
     end
 
     before do
-      allow(ENV).to receive(:[]).with('PYTHON_API_URL').and_return('http://localhost:8000')
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('PYTHON_API_URL', anything).and_return('http://localhost:8000')
     end
 
     context 'with valid XRP transaction data' do

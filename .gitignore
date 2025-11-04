@@ -68,6 +68,7 @@ logs/
 Gemfile.lock
 .bundle/
 vendor/bundle
+ruby_services/vendor/
 
 # Docker
 docker-compose.override.yml

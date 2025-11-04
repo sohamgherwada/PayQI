@@ -78,6 +78,7 @@ class TestTransactions:
             email="other@example.com", password_hash=hash_password("password123"), kyc_verified=False
         )
         db.add(other_merchant)
+        db.flush()
 
         other_payment = Payment(
             merchant_id=other_merchant.id,
