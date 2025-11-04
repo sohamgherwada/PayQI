@@ -18,20 +18,59 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    - name: Create .env file for testing
+      run: |
+        cat > .env << EOF
+        DATABASE_URL=postgresql+psycopg2://payqi:payqi@db:5432/payqi
+        JWT_SECRET=test_secret_key_for_testing_only_change_in_production_min_32_chars
+        JWT_EXPIRES_MINUTES=60
+        NOWPAYMENTS_API_KEY=
+        NOWPAYMENTS_IPN_SECRET=
+        XRP_WALLET_ADDRESS=rTestWallet123
+        BACKEND_CORS_ORIGINS=http://localhost:5173
+        EOF
+
     - name: Start services
       run: |
         docker-compose up -d db backend
-        sleep 10
-
-    - name: Wait for API to be ready
+        
+    - name: Wait for services to be ready
       run: |
-        timeout 60 bash -c 'until curl -f http://localhost:8000/health; do sleep 2; done'
+        echo "Waiting for services to start..."
+        sleep 15
+        echo "Checking PostgreSQL..."
+        for i in {1..30}; do
+          if docker-compose exec -T db pg_isready -U payqi 2>/dev/null; then
+            echo "PostgreSQL is ready!"
+            break
+          fi
+          echo "Waiting for PostgreSQL... ($i/30)"
+          sleep 2
+        done
+        
+        echo "Checking API..."
+        for i in {1..30}; do
+          if curl -f http://localhost:8000/health 2>/dev/null; then
+            echo "API is ready!"
+            break
+          fi
+          echo "Waiting for API... ($i/30)"
+          sleep 2
+        done
 
     - name: Run integration tests
       run: |
         chmod +x test_api.sh
         API_URL=http://localhost:8000 ./test_api.sh
 
+    - name: Show logs on failure
+      if: failure()
+      run: |
+        echo "=== Backend Logs ==="
+        docker-compose logs backend || true
+        echo "=== Database Logs ==="
+        docker-compose logs db || true
+
     - name: Cleanup
       if: always()
-      run: docker-compose down
+      run: docker-compose down -v
