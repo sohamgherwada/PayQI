@@ -8,10 +8,10 @@ from typing import Callable
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add security headers to all responses"""
-    
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         response = await call_next(request)
-        
+
         # Security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
@@ -20,26 +20,26 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Content-Security-Policy"] = "default-src 'self'"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
-        
+
         return response
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
     """Add request ID to track requests through the system"""
-    
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         request_id = str(uuid.uuid4())
         request.state.request_id = request_id
-        
+
         response = await call_next(request)
         response.headers["X-Request-ID"] = request_id
-        
+
         return response
 
 
 class TimingMiddleware(BaseHTTPMiddleware):
     """Add timing information to responses"""
-    
+
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
         response = await call_next(request)

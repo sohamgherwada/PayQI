@@ -60,5 +60,3 @@ class PaymentOut(BaseModel):
 
 class TransactionsResponse(BaseModel):
     items: List[PaymentOut]
-
-

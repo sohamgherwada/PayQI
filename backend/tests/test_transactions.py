@@ -9,7 +9,7 @@ class TestTransactions:
     def test_get_transactions_success(self, authenticated_client, db, test_merchant):
         """Test getting transactions"""
         from app.models import Payment
-        
+
         # Create multiple payments
         for i in range(3):
             payment = Payment(
@@ -17,11 +17,11 @@ class TestTransactions:
                 amount=Decimal(f"{10 + i}.00"),
                 currency="XRP",
                 status="pending" if i % 2 == 0 else "completed",
-                provider="xrp"
+                provider="xrp",
             )
             db.add(payment)
         db.commit()
-        
+
         response = authenticated_client.get("/api/transactions")
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -40,25 +40,21 @@ class TestTransactions:
     def test_get_transactions_pagination(self, authenticated_client, db, test_merchant):
         """Test transaction pagination"""
         from app.models import Payment
-        
+
         # Create 5 payments
         for i in range(5):
             payment = Payment(
-                merchant_id=test_merchant.id,
-                amount=Decimal("10.00"),
-                currency="XRP",
-                status="pending",
-                provider="xrp"
+                merchant_id=test_merchant.id, amount=Decimal("10.00"), currency="XRP", status="pending", provider="xrp"
             )
             db.add(payment)
         db.commit()
-        
+
         # Get first 2
         response = authenticated_client.get("/api/transactions?skip=0&limit=2")
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert len(data["items"]) == 2
-        
+
         # Get next 2
         response = authenticated_client.get("/api/transactions?skip=2&limit=2")
         assert response.status_code == status.HTTP_200_OK
@@ -75,40 +71,34 @@ class TestTransactions:
         from app.models import Merchant, Payment
         from app.security import hash_password, create_access_token
         from decimal import Decimal
-        
+
         # Create another merchant with payment
         other_merchant = Merchant(
-            email="other@example.com",
-            password_hash=hash_password("password123"),
-            kyc_verified=False
+            email="other@example.com", password_hash=hash_password("password123"), kyc_verified=False
         )
         db.add(other_merchant)
-        
+
         other_payment = Payment(
             merchant_id=other_merchant.id,
             amount=Decimal("100.00"),
             currency="BTC",
             status="completed",
-            provider="nowpayments"
+            provider="nowpayments",
         )
         db.add(other_payment)
         db.commit()
-        
+
         # Create payment for test_merchant
         my_payment = Payment(
-            merchant_id=test_merchant.id,
-            amount=Decimal("50.00"),
-            currency="XRP",
-            status="pending",
-            provider="xrp"
+            merchant_id=test_merchant.id, amount=Decimal("50.00"), currency="XRP", status="pending", provider="xrp"
         )
         db.add(my_payment)
         db.commit()
-        
+
         # Get transactions for test_merchant
         token = create_access_token(subject=test_merchant.email)
         client.headers.update({"Authorization": f"Bearer {token}"})
-        
+
         response = client.get("/api/transactions")
         assert response.status_code == status.HTTP_200_OK
         data = response.json()

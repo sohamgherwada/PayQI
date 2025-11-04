@@ -14,21 +14,14 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):  # type: 
     # Check if merchant already exists
     existing = db.query(Merchant).filter(Merchant.email == request.email).first()
     if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+
     # Create new merchant
-    merchant = Merchant(
-        email=request.email,
-        password_hash=hash_password(request.password),
-        kyc_verified=False
-    )
+    merchant = Merchant(email=request.email, password_hash=hash_password(request.password), kyc_verified=False)
     db.add(merchant)
     db.commit()
     db.refresh(merchant)
-    
+
     return merchant
 
 
@@ -36,11 +29,8 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):  # type: 
 def login(request: LoginRequest, db: Session = Depends(get_db)):  # type: ignore[no-untyped-def]
     merchant = db.query(Merchant).filter(Merchant.email == request.email).first()
     if not merchant or not verify_password(request.password, merchant.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+
     token = create_access_token(subject=merchant.email)
     return TokenResponse(access_token=token)
 

@@ -59,6 +59,12 @@ jobs:
         ruby-version: '3.2'
         bundler-cache: true
 
+    - name: Install dependencies
+      working-directory: ./ruby_services
+      run: |
+        bundle config set --local without ''
+        bundle install
+
     - name: Run RuboCop
       working-directory: ./ruby_services
       run: bundle exec rubocop --parallel

@@ -33,7 +33,7 @@ else:
     _is_postgresql = False
 
 # Add parent directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app.database import Base, get_db
 from app.main import app
@@ -58,12 +58,13 @@ def db():
 @pytest.fixture(scope="function")
 def client(db):
     """Create a test client with database override"""
+
     def override_get_db():
         try:
             yield db
         finally:
             pass
-    
+
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
         yield test_client
@@ -73,11 +74,7 @@ def client(db):
 @pytest.fixture
 def test_merchant(db):
     """Create a test merchant"""
-    merchant = Merchant(
-        email="test@example.com",
-        password_hash=hash_password("testpassword123"),
-        kyc_verified=False
-    )
+    merchant = Merchant(email="test@example.com", password_hash=hash_password("testpassword123"), kyc_verified=False)
     db.add(merchant)
     db.commit()
     db.refresh(merchant)
@@ -101,6 +98,7 @@ def authenticated_client(client, test_merchant_token):
 def test_payment(db, test_merchant):
     """Create a test payment"""
     from decimal import Decimal
+
     payment = Payment(
         merchant_id=test_merchant.id,
         amount=Decimal("10.00"),
@@ -108,7 +106,7 @@ def test_payment(db, test_merchant):
         status="pending",
         provider="xrp",
         pay_address="rTestAddress123",
-        provider_invoice_id="xrp_1_123456"
+        provider_invoice_id="xrp_1_123456",
     )
     db.add(payment)
     db.commit()

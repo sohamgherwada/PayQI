@@ -27,5 +27,3 @@ def get_current_merchant(
     if not merchant:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return merchant
-
-

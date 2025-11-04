@@ -12,8 +12,8 @@ engine = create_engine(
     max_overflow=settings.DB_MAX_OVERFLOW,
     pool_timeout=settings.DB_POOL_TIMEOUT,
     pool_pre_ping=True,  # Verify connections before using
-    pool_recycle=3600,   # Recycle connections after 1 hour
-    echo=False,          # Set to True for SQL debugging
+    pool_recycle=3600,  # Recycle connections after 1 hour
+    echo=False,  # Set to True for SQL debugging
     future=True,
 )
 
@@ -45,6 +45,5 @@ def get_db():  # type: ignore[no-untyped-def]
 def init_db() -> None:
     # Lazy import to avoid circulars
     from app import models  # noqa: F401
+
     Base.metadata.create_all(bind=engine)
-
-

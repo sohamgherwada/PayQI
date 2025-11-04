@@ -49,13 +49,13 @@ class TestSecurity:
         """Test token expiration"""
         from app.security import create_access_token
         import time
-        
+
         # Create token with 1 second expiration
         token = create_access_token(subject="test@example.com", expires_minutes=0.0001)
-        
+
         # Wait a bit
         time.sleep(0.1)
-        
+
         # Should fail to decode
         with pytest.raises(Exception):
             decode_token(token)

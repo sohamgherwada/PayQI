@@ -44,5 +44,3 @@ app.include_router(transactions.router, prefix="/api", tags=["transactions"])
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok"}
-
-
