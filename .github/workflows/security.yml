@@ -46,7 +46,7 @@ jobs:
         bandit -r app/ -f json -o bandit-report.json || true
 
     - name: Upload Bandit report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: bandit-report
         path: backend/bandit-report.json
@@ -97,7 +97,7 @@ jobs:
     
     - name: Upload Trivy results as artifact (fallback)
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: trivy-security-scan
         path: trivy-results.sarif
